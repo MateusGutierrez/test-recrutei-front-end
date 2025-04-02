@@ -1,10 +1,11 @@
-import { Button } from '@/components/ui/button';
+import { ThemeProvider } from './components/theme-provider';
+import GlobalRoute from './routes';
 
 function App() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-svh">
-      <Button>Click me</Button>
-    </div>
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <GlobalRoute />
+    </ThemeProvider>
   );
 }
 
