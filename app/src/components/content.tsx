@@ -1,7 +1,6 @@
 import { Bounce, ToastContainer } from 'react-toastify';
 import { cn } from '@/lib/utils';
 
-import { useTheme } from './theme-provider';
 import Header from './header';
 import Footer from './footer';
 interface Props {
@@ -9,7 +8,6 @@ interface Props {
   className?: string;
 }
 const Content: React.FC<Props> = ({ children, className }) => {
-  const { theme } = useTheme();
   return (
     <section className="w-full h-full">
       <Header />
@@ -23,7 +21,7 @@ const Content: React.FC<Props> = ({ children, className }) => {
         <ToastContainer
           position="bottom-right"
           autoClose={2500}
-          theme={theme}
+          theme="light"
           hideProgressBar={false}
           newestOnTop={false}
           closeOnClick={false}

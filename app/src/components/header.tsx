@@ -1,4 +1,3 @@
-import { ModeToggle } from './mode-toggle';
 import logo from '@/assets/react.svg';
 import {
   NavigationMenu,
@@ -40,10 +39,8 @@ const Header: React.FC = () => {
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
-          <ModeToggle />
         </nav>
         <div className="md:hidden flex items-center gap-4">
-          <ModeToggle />
           <button onClick={() => setIsOpen(!isOpen)}>
             <Menu size={24} />
           </button>
