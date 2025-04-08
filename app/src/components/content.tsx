@@ -2,7 +2,6 @@ import { Bounce, ToastContainer } from 'react-toastify';
 import { cn } from '@/lib/utils';
 
 import Header from './header';
-import Footer from './footer';
 interface Props {
   children: React.ReactNode;
   className?: string;
@@ -13,7 +12,7 @@ const Content: React.FC<Props> = ({ children, className }) => {
       <Header />
       <section
         className={cn(
-          'min-h-[90vh] w-[90%] m-[auto] bg-background text-foreground pb-[60px]',
+          'min-h-[90vh] w-[90%] m-[auto] text-foreground pb-[60px]',
           className
         )}
       >
@@ -32,7 +31,6 @@ const Content: React.FC<Props> = ({ children, className }) => {
           transition={Bounce}
         />
       </section>
-      <Footer />
     </section>
   );
 };
