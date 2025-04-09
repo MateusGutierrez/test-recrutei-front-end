@@ -1,28 +1,30 @@
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { XIcon } from 'lucide-react';
-import { ProfileForm } from './form';
-import useIsVisible from '@/hooks/useIsVisible';
+import { useCallback } from 'react';
 
-const Modal: React.FC = () => {
-  const { isVisible, hide, show } = useIsVisible();
+interface Props {
+  children: React.ReactNode;
+  trigger?: React.ReactNode;
+  isVisible: boolean;
+  show: () => void;
+  hide: () => void;
+}
+
+const Modal: React.FC<Props> = ({
+  children,
+  hide,
+  isVisible,
+  trigger,
+  show
+}) => {
+  const handleOpenChange = useCallback(
+    () => (isVisible ? show() : hide()),
+    [hide, isVisible, show]
+  );
   return (
-    <Dialog open={isVisible} onOpenChange={hide}>
-      <div className="text-center mb-4 bg-white w-[162px] h-[72px] rounded-b-[16px] flex items-center justify-center m-auto">
-        <Button
-          className="h-[40px] rounded-[32px] font-bold cursor-pointer"
-          onClick={() => show()}
-        >
-          Adicionar Tarefa
-        </Button>
-      </div>
-
+    <Dialog open={isVisible} onOpenChange={handleOpenChange}>
+      {trigger}
       <DialogContent className="max-w-[430px] max-h-[670px] top-[350px] rounded-[24px] w-full justify-self-center">
         <Button
           variant="secondary"
@@ -31,13 +33,7 @@ const Modal: React.FC = () => {
         >
           <XIcon />
         </Button>
-        <DialogHeader>
-          <DialogTitle>Adicionar Tarefa</DialogTitle>
-          <DialogDescription>
-            Preencha os detalhes da nova tarefa
-          </DialogDescription>
-        </DialogHeader>
-        <ProfileForm />
+        {children}
       </DialogContent>
     </Dialog>
   );

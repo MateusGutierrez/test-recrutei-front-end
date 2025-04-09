@@ -4,7 +4,7 @@ import { Label } from './ui/label';
 
 const Header: React.FC = () => {
   return (
-    <header className="flex max-w-[1220px] w-[80%] h-[87px] mt-[40px] m-auto bg-popover gap-[24px] p-[16px] text-foreground items-center border border-border rounded-[24px]">
+    <header className="flex max-w-[1220px] w-[90%] h-[87px] mt-[40px] m-auto bg-popover gap-[24px] p-[16px] text-foreground items-center border border-border rounded-[24px]">
       <div className="flex gap-4 items-center">
         <img src={logo} alt="logo" className="w-[56px] sm:w-16" />
       </div>

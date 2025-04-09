@@ -5,14 +5,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from './ui/form';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Popover,
@@ -21,30 +14,57 @@ import {
 } from '@/components/ui/popover';
 import { Calendar } from './ui/calendar';
 import { format } from 'date-fns';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from './ui/select';
+import useTaskStore from '@/store';
+import { v4 as uuidv4 } from 'uuid';
+import { columns } from './column';
+import { head } from 'lodash';
+import { toast } from 'react-toastify';
 
 const formSchema = z.object({
   task: z.string().min(2).max(50),
   description: z.string().min(5).max(300),
-  admin: z.string().min(1),
-  date: z.date().or(z.string())
+  admin: z.array(z.string()).min(1),
+  date: z.date()
 });
-export function ProfileForm() {
-  // 1. Define your form.
+
+const adminOptions = ['Matheus Gomes', 'Pedro Paulo', 'Paulo'];
+
+interface Props {
+  hide: () => void;
+}
+
+const TaskForm: React.FC<Props> = ({ hide }) => {
+  const { addTask } = useTaskStore();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       task: '',
       description: '',
-      admin: '',
-      date: ''
-    }
+      admin: [],
+      date: undefined
+    },
+    mode: 'onChange'
   });
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  const { isValid } = form.formState;
+
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    addTask({
+      ...values,
+      id: uuidv4(),
+      columnId: head(columns)?.id as string
+    });
+    toast.success('Tarefa adicionada com sucesso!');
     form.reset();
-  }
+    hide();
+  };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -82,21 +102,48 @@ export function ProfileForm() {
         <FormField
           control={form.control}
           name="admin"
-          render={({ field }) => (
+          render={() => (
             <FormItem>
               <FormLabel className="font-700 text-[#747F93] text-[12px]">
                 Responsáveis
               </FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select
+                onValueChange={value => {
+                  const current = form.getValues('admin');
+                  const isSelected = current.includes(value);
+                  const updated = isSelected
+                    ? current.filter(item => item !== value)
+                    : [...current, value];
+
+                  form.setValue('admin', updated, { shouldValidate: true });
+                }}
+              >
                 <FormControl>
                   <SelectTrigger className="cursor-pointer w-full rounded-[16px]">
-                    <SelectValue />
+                    <SelectValue
+                      children={
+                        form.watch('admin').join(', ') ||
+                        'Selecione responsáveis'
+                      }
+                    />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="joão">João</SelectItem>
-                  <SelectItem value="maria">Maria</SelectItem>
-                  <SelectItem value="helena">Helena</SelectItem>
+                  {adminOptions.map(admin => {
+                    const selected = form.watch('admin').includes(admin);
+                    return (
+                      <SelectItem
+                        key={admin}
+                        value={admin}
+                        className="flex items-center justify-between cursor-pointer w-full"
+                      >
+                        {admin}
+                        {selected && (
+                          <Check className="h-4 w-4 text-green-600 justify-self-end w-full" />
+                        )}
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </FormItem>
@@ -106,17 +153,18 @@ export function ProfileForm() {
           control={form.control}
           name="date"
           render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel className="font-700 text-[#747F93] text-[12px]">
+            <FormItem className="flex flex-col w-fit">
+              <FormLabel className="font-700 text-[#747F93] text-[12px] w-fit">
                 Data limite
               </FormLabel>
               <Popover>
-                <PopoverTrigger className="w-fit">
+                <PopoverTrigger>
                   <FormControl>
                     <Button
                       variant={'outline'}
+                      type="button"
                       className={cn(
-                        'cursor-pointer flex justify-self-start  w-[204px] rounded-[16px] text-left font-normal',
+                        'cursor-pointer flex justify-self-start w-[204px] rounded-[16px] text-left font-normal',
                         !field.value && 'text-muted-foreground'
                       )}
                     >
@@ -136,9 +184,7 @@ export function ProfileForm() {
                     mode="single"
                     selected={field.value as Date}
                     onSelect={field.onChange}
-                    disabled={date =>
-                      date > new Date() || date < new Date('1900-01-01')
-                    }
+                    disabled={date => date < new Date()}
                     initialFocus
                   />
                 </PopoverContent>
@@ -149,10 +195,13 @@ export function ProfileForm() {
         <Button
           type="submit"
           className="cursor-pointer w-full rounded-[99px] h-[40px]"
+          disabled={!isValid}
         >
           Adicionar tarefa
         </Button>
       </form>
     </Form>
   );
-}
+};
+
+export default TaskForm;
