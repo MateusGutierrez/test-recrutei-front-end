@@ -55,3 +55,6 @@ npm install
 ```bash
 npm run dev
 ```
+
+## 🚀 Deploy
+[https://test-recrutei-front-end.vercel.app/](https://test-recrutei-front-end.vercel.app/)
