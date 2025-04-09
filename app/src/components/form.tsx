@@ -26,6 +26,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { columns } from './column';
 import { head } from 'lodash';
 import { toast } from 'react-toastify';
+import { useCallback } from 'react';
 
 const formSchema = z.object({
   task: z.string().min(2).max(50),
@@ -54,16 +55,19 @@ const TaskForm: React.FC<Props> = ({ hide }) => {
   });
   const { isValid } = form.formState;
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    addTask({
-      ...values,
-      id: uuidv4(),
-      columnId: head(columns)?.id as string
-    });
-    toast.success('Tarefa adicionada com sucesso!');
-    form.reset();
-    hide();
-  };
+  const onSubmit = useCallback(
+    (values: z.infer<typeof formSchema>) => {
+      addTask({
+        ...values,
+        id: uuidv4(),
+        columnId: head(columns)?.id as string
+      });
+      toast.success('Tarefa adicionada com sucesso!');
+      form.reset();
+      hide();
+    },
+    [addTask, form, hide]
+  );
 
   return (
     <Form {...form}>
